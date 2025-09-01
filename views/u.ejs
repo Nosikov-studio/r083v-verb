@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+        .answer {
+            color: blue;
+            border: 1px dotted red;            
+        }
+        </style>
+</head>
+<body>
+    <h1> Заглушка</h1>
+    <p>Длина массива: <%= data.length %></p>
+    <p>Массив arr: <%= arr.join(', ') %></p>
+
+    <button id="brn">Кнопка</button>
+    <div id="output"></div>
+<hr/>
+<div id="container"></div>
+
+  <script>
+    const data = <%- JSON.stringify(data) %>;
+    // Передаём массив arr из сервера в клиентский JS
+    const arr = <%- JSON.stringify(arr) %>;
+
+    // Функция выбора случайного элемента с удалением из массива
+    function getRandomAndRemove(array) {
+      if (array.length === 0) {
+        return null; // Массив пуст, нечего выбирать
+      }
+
+      const randomIndex = Math.floor(Math.random() * array.length);
+      const value = array[randomIndex];
+      array.splice(randomIndex, 1); // Удаляем выбранный элемент
+
+      return value;
+    }
+
+    // Обработчик нажатия на кнопку
+    document.getElementById('brn').addEventListener('click', () => {
+      document.getElementById('container').textContent='';
+      
+        const selected = getRandomAndRemove(arr);
+
+      if (selected === null) {
+        alert('Массив пуст! Больше элементов выбирать нельзя.');
+        return;
+      }
+
+      document.getElementById('output').textContent = `Выбранное число: ${selected}; Остаток массива: [${arr.join(', ')}]`;
+
+      console.log('Выбранный элемент:', selected);
+      console.log('Оставшийся массив:', arr);
+      //*******************************************************
+      const item = data[selected];
+      // Создаём новый <p> и помещаем туда контент
+      const p = document.createElement('p');
+      // Если item — объект, можно отобразить, например, в JSON-формате:
+      p.textContent = `Строка №${selected}, id: ${item.id}, ${JSON.stringify(item)}`;
+      //p.textContent = `Строка №${selected}: ${item}`;
+
+      // Добавляем <p> в контейнер
+      document.getElementById('container').appendChild(p);
+      
+      ////////////////////////////////
+      const h1 = document.createElement('h1');
+      h1.textContent = `${item.translate}`;
+      document.getElementById('container').appendChild(h1);
+
+      const btn = document.createElement('button');
+      btn.textContent = 'ПРОВЕРЬ СЕБЯ!';
+        btn.addEventListener('click', ()=>{
+
+                  const h1 = document.createElement('h1');
+                  h1.classList.add('answer');
+                  h1.textContent = `${item.verb} - ${item.v2} - ${item.v3}`;
+                document.getElementById('container').appendChild(h1);
+//*************************************************************
+//Запрос на получение предложения (поле text) из tab2
+fetch(`/text/${item.verb}`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Ошибка сети при запросе');
+      }
+      return response.json();
+    })
+    .then(jsonData => {
+      // jsonData - массив объектов с полем text из вашего API
+      const answerContainer = document.createElement('div');
+      answerContainer.classList.add('answer');
+
+      if (jsonData.length === 0) {
+        answerContainer.textContent = 'Данные не найдены для этого глагола.';
+      } else {
+        // Можно вывести все тексты через запятую, или каждый в отдельный параграф
+        jsonData.forEach(entry => {
+          const p = document.createElement('p');
+          p.textContent = entry.text;
+          p.style.fontSize = '50px';
+          answerContainer.appendChild(p);
+                //**********************************************************
+// Предполагается, что entry.pic — это base64-строка картинки, например "iVBORw0KGgoAAAANS..."
+if (entry.pic) {
+  const img = document.createElement('img');
+  // Здесь MIME-тип важен; обычно можно использовать "image/png" или "image/jpeg"
+  img.src = `data:image/png;base64,${entry.pic}`;
+  img.width =1000; 
+  // Добавляем картинку в контейнер на страницу
+  container.appendChild(img);
+} else {
+  // Если картинки нет
+  const noPic = document.createElement('p');
+  noPic.textContent = "Изображение отсутствует";
+  container.appendChild(noPic);
+}
+//**************************************************************
+        });
+      }
+
+      document.getElementById('container').appendChild(answerContainer);
+
+    })
+    .catch(err => {
+      console.error('Ошибка при получении данных:', err);
+      alert('Произошла ошибка при загрузке данных.');
+    });
+//***************************************************************
+
+        });
+      document.getElementById('container').appendChild(btn);  
+    });
+  </script>
+</body>
+</html>

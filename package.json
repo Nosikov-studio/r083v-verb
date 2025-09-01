@@ -1,0 +1,21 @@
+{
+  "name": "slovar-app",
+  "version": "1.0.0",
+  "description": "Приложение для отображения данных из базы данных slovar.db",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "ejs": "^3.1.9"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": ["express", "sqlite", "database"],
+  "author": "",
+  "license": "MIT"
+} 

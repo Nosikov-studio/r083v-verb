@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Словарь - База данных</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .stats {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4facfe;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .table-container {
+            padding: 30px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        th {
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #f1f3f4;
+            font-size: 0.9em;
+        }
+
+        tbody tr:hover {
+            background-color: #f8f9fa;
+            transform: translateY(-1px);
+            transition: all 0.2s ease;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #fafbfc;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #6c757d;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .table-container {
+                padding: 15px;
+            }
+            
+            th, td {
+                padding: 8px 6px;
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>📚 Словарь</h1>
+            <p>База данных SQLite - Таблица tab1</p>
+            <hr/>
+<a href="/u"> тренажер </a>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-number"><%= totalRows %></div>
+                <div class="stat-label">Всего записей</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number"><%= columns.length %></div>
+                <div class="stat-label">Колонок</div>
+            </div>
+            <button class="refresh-btn" onclick="location.reload()">🔄 Обновить</button>
+        </div>
+
+        <div class="table-container">
+            <% if (data && data.length > 0) { %>
+                <table>
+                    <thead>
+                        <tr>
+                            <% columns.forEach(function(column) { %>
+                                <th><%= column %></th>
+                            <% }); %>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% data.forEach(function(row) { %>
+                            <tr>
+                                <% columns.forEach(function(column) { %>
+                                    <td><%= row[column] !== null ? row[column] : '-' %></td>
+                                <% }); %>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            <% } else { %>
+                <div class="loading">
+                    <h3>📋 Данные не найдены</h3>
+                    <p>В таблице tab1 нет данных или таблица не существует.</p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <script>
+        // Автоматическое обновление каждые 30 секунд
+        setInterval(() => {
+            location.reload();
+        }, 30000);
+
+        // Добавляем анимацию появления строк таблицы
+        document.addEventListener('DOMContentLoaded', function() {
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach((row, index) => {
+                row.style.opacity = '0';
+                row.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    row.style.transition = 'all 0.3s ease';
+                    row.style.opacity = '1';
+                    row.style.transform = 'translateY(0)';
+                }, index * 50);
+            });
+        });
+    </script>
+</body>
+</html> 
